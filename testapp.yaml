@@ -1,0 +1,47 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: testapp
+  labels:
+    name: testapp
+spec:
+  type: LoadBalancer
+  ports:
+  - name: http
+    port: 2000
+    targetPort: 2000
+  selector:
+    name: testapp
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name:  testapp-deploy
+  labels:
+    name:  testapp
+spec:
+  replicas: 1
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        name:  testapp
+    spec:
+      imagePullSecrets:
+        - name: acr-secret
+      containers:
+      - image: acralpha.azurecr.io/testapp:V1
+        name:  testapp-cntnr
+        resources:
+          requests:
+            cpu: "20m"
+            memory: "55M"
+        ports:
+        - containerPort:  2000
+          name:  testapppi
+        imagePullPolicy: Always
+      restartPolicy: Always
