@@ -1,47 +1,39 @@
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: testapp
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: testapp
+    spec:
+      containers:
+      - name: testapp
+        image: acralpha.azurecr.io/testapp:v1
+        ports:
+        - containerPort: 80
+      imagePullSecrets:
+      - name: acr-secret-testapp
+---
 apiVersion: v1
 kind: Service
 metadata:
   name: testapp
-  labels:
-    name: testapp
+spec:
+  ports:
+  - port: 80
+  selector:
+    app: testapp
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: testapplb
 spec:
   type: LoadBalancer
   ports:
-  - name: http
-    port: 1000
-    targetPort: 1000
+  - port: 80
   selector:
-    name: testapp
----
-apiVersion: extensions/v1beta1
-kind: Deployment
-metadata:
-  name:  testapp-deploy
-  labels:
-    name:  testapp
-spec:
-  replicas: 1
-  strategy:
-    rollingUpdate:
-      maxSurge: 1
-      maxUnavailable: 1
-    type: RollingUpdate
-  template:
-    metadata:
-      labels:
-        name:  testapp
-    spec:
-      imagePullSecrets:
-        - name: acr-secret
-      containers:
-      - image: acralpha.azurecr.io/testapp:V1
-        name:  testapp-cntnr
-        resources:
-          requests:
-            cpu: "20m"
-            memory: "55M"
-        ports:
-        - containerPort:  1000
-          name:  testapp
-        imagePullPolicy: Always
-      restartPolicy: Always
+    app: testapp
