@@ -8,8 +8,8 @@ spec:
   type: LoadBalancer
   ports:
   - name: http
-    port: 2000
-    targetPort: 2000
+    port: 1000
+    targetPort: 1000
   selector:
     name: testapp
 ---
@@ -41,7 +41,7 @@ spec:
             cpu: "20m"
             memory: "55M"
         ports:
-        - containerPort:  2000
-          name:  testapppi
+        - containerPort:  1000
+          name:  testapp
         imagePullPolicy: Always
       restartPolicy: Always
